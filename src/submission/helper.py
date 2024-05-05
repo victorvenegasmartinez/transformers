@@ -44,7 +44,7 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
     ###         lr_decay=True
     ###         warmup_tokens=512*20
     ###         final_tokens=200*len(pretrain_dataset)*block_size
-    ###         num_workers=4
+    ###         num_workers=0
     ###     Hyperparameters for finetuning WITH a pretrained model:
     ###         max_epochs=10
     ###         batch_size=256
@@ -52,7 +52,7 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
     ###         lr_decay=True
     ###         warmup_tokens=512*20
     ###         final_tokens=200*len(pretrain_dataset)*block_size
-    ###         num_workers=4
+    ###         num_workers=0
     ###
     ###
     ### Note: Please use torch.load(reading_params_path, map_location=torch.device('cpu')) to load pretrained model 
@@ -78,7 +78,7 @@ def pretrain(pretrain_dataset, block_size, model, pretrain_lr=6e-3, writer=None)
     ###     lr_decay=True
     ###     warmup_tokens=512*20
     ###     final_tokens=200*len(pretrain_dataset)*block_size
-    ###     num_workers=4
+    ###     num_workers=0
 
     trainer_obj = None #Trainer object (see trainer.py for more details)
     tconf = None #TrainerConfig object (see trainer.py for more details)

@@ -25,8 +25,9 @@ Options:
 """
 from docopt import docopt
 from datetime import datetime
-import numpy as np
 import torch
+import numpy as np
+
 import torch.nn as nn
 from tqdm import tqdm
 from torch.nn import functional as F
