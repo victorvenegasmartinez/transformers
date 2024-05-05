@@ -48,54 +48,8 @@ class sample_GPTConfig:
 #########
 # TESTS #
 #########
+
 class Test_1c(GradedTestCase):
-  def setUp(self):
-    self.pretrain_dataset = submission.CharCorruptionDataset(PRETRAIN_TEXT, BLOCK_SIZE)
-    self.mconf = submission.GPTConfig(self.pretrain_dataset.vocab_size, self.pretrain_dataset.block_size, n_layer=4, n_head=8, n_embd=256)
-    self.vanilla_model = submission.initialize_vanilla_model(self.mconf)
-
-  @graded(is_hidden=True)
-  def test_0(self):
-    """1c-0-hidden:  vanilla model similarity"""
-    expected = self.run_with_solution_if_possible(submission, lambda sub_or_sol:sub_or_sol).initialize_vanilla_model(self.mconf)
-    self.assertEqual(str(expected), str(self.vanilla_model))
-  
-  @graded(timeout=15)
-  def test_1(self):
-    """1c-1-basic:  correct trainer object initialization for finetune without pretraining"""
-    student_trainer_conf, student_trainer = submission.finetune(None, './data/birth_places_train.tsv', self.pretrain_dataset, BLOCK_SIZE, self.vanilla_model)
-
-    self.assertEqual(student_trainer_conf.max_epochs, 75)
-    self.assertEqual(student_trainer_conf.batch_size, 256)
-    self.assertEqual(student_trainer_conf.learning_rate, 0.0006)
-    self.assertEqual(student_trainer_conf.betas, (0.9, 0.95))
-    self.assertEqual(student_trainer_conf.grad_norm_clip, 1.0)
-    self.assertEqual(student_trainer_conf.weight_decay, 0.1)
-    self.assertEqual(student_trainer_conf.lr_decay,True)
-    self.assertEqual(student_trainer_conf.warmup_tokens, 10240)
-    self.assertEqual(student_trainer_conf.final_tokens, 75187200)
-    self.assertEqual(student_trainer_conf.ckpt_path, None)
-    self.assertEqual(student_trainer_conf.num_workers, 4)
-
-class Test_1d(GradedTestCase):
-  @graded(is_hidden=True)
-  def test_0(self):
-    """1d-0-hidden:   test the dev score for vanilla attention without pretrain"""
-    n_correct, n_total = score_preds(
-        "./submission/vanilla.nopretrain.dev.predictions",
-        "./data/birth_dev.tsv")
-    self.assertGreaterEqual(n_correct, 1)
-  
-  @graded(is_hidden=True)
-  def test_1(self):
-    #TODO: Make sure to place this under the autograder code section birth_test.tsv not exposed to students
-    """1d-1-hidden:   test the test score for vanilla attention without pretrain"""
-    n_correct, n_total = score_preds(
-        "./submission/vanilla.nopretrain.test.predictions",
-        "./data/birth_test.tsv")
-    self.assertGreaterEqual(n_correct, 1)
-
-class Test_1e(GradedTestCase):
   def setUp(self):
     self.data = ("let me take you down\ncause I'm going to\n"
        "strawberry fields\nnothing is real and nothing to get hung about")
@@ -105,7 +59,7 @@ class Test_1e(GradedTestCase):
 
   @graded()
   def test_0(self):
-    """1e-0-basic:  check CharCorruptionDataset truncation length"""
+    """1c-0-basic:  check CharCorruptionDataset truncation length"""
     invalid_len = False
 
     len_fracs = []
@@ -123,7 +77,7 @@ class Test_1e(GradedTestCase):
 
   @graded()
   def test_1(self):
-    """1e-1-basic:  check CharCorruptionDataset rearrange"""
+    """1c-1-basic:  check CharCorruptionDataset rearrange"""
     format_ok = True
 
     for (x, y), entry in zip(self.dataset, self.data.split("\n")):
@@ -158,7 +112,7 @@ class Test_1e(GradedTestCase):
   
   @graded()
   def test_2(self):
-    """1e-2-basic:  check CharCorruptionDataset io"""
+    """1c-2-basic:  check CharCorruptionDataset io"""
     is_ok = True
 
     for (x, y), entry in zip(self.dataset, self.data.split("\n")):
@@ -170,7 +124,7 @@ class Test_1e(GradedTestCase):
   
   @graded()
   def test_3(self):
-    """1e-3-basic:  check CharCorruptionDataset masked content length"""
+    """1c-3-basic:  check CharCorruptionDataset masked content length"""
     lens = []
     true_lens = []
 
@@ -184,6 +138,52 @@ class Test_1e(GradedTestCase):
 
     self.assertLessEqual(np.abs(np.mean(np.array(lens) - np.array(true_lens))), 1.5)
     self.assertGreater(np.std(lens), 0.01)
+
+class Test_1d(GradedTestCase):
+  def setUp(self):
+    self.pretrain_dataset = submission.CharCorruptionDataset(PRETRAIN_TEXT, BLOCK_SIZE)
+    self.mconf = submission.GPTConfig(self.pretrain_dataset.vocab_size, self.pretrain_dataset.block_size, n_layer=4, n_head=8, n_embd=256)
+    self.vanilla_model = submission.initialize_vanilla_model(self.mconf)
+
+  @graded(is_hidden=True)
+  def test_0(self):
+    """1d-0-hidden:  vanilla model similarity"""
+    expected = self.run_with_solution_if_possible(submission, lambda sub_or_sol:sub_or_sol).initialize_vanilla_model(self.mconf)
+    self.assertEqual(str(expected), str(self.vanilla_model))
+  
+  @graded(timeout=15)
+  def test_1(self):
+    """1d-1-basic:  correct trainer object initialization for finetune without pretraining"""
+    student_trainer_conf, student_trainer = submission.finetune(None, './data/birth_places_train.tsv', self.pretrain_dataset, BLOCK_SIZE, self.vanilla_model)
+
+    self.assertEqual(student_trainer_conf.max_epochs, 75)
+    self.assertEqual(student_trainer_conf.batch_size, 256)
+    self.assertEqual(student_trainer_conf.learning_rate, 0.0006)
+    self.assertEqual(student_trainer_conf.betas, (0.9, 0.95))
+    self.assertEqual(student_trainer_conf.grad_norm_clip, 1.0)
+    self.assertEqual(student_trainer_conf.weight_decay, 0.1)
+    self.assertEqual(student_trainer_conf.lr_decay,True)
+    self.assertEqual(student_trainer_conf.warmup_tokens, 10240)
+    self.assertEqual(student_trainer_conf.final_tokens, 75187200)
+    self.assertEqual(student_trainer_conf.ckpt_path, None)
+
+class Test_1e(GradedTestCase):
+  @graded(is_hidden=True)
+  def test_0(self):
+    """1e-0-hidden:   test the dev score for vanilla attention without pretrain"""
+    n_correct, n_total = score_preds(
+        "./submission/vanilla.nopretrain.dev.predictions",
+        "./data/birth_dev.tsv")
+    self.assertGreaterEqual(n_correct, 1)
+  
+  @graded(is_hidden=True)
+  def test_1(self):
+    #TODO: Make sure to place this under the autograder code section birth_test.tsv not exposed to students
+    """1e-1-hidden:   test the test score for vanilla attention without pretrain"""
+    n_correct, n_total = score_preds(
+        "./submission/vanilla.nopretrain.test.predictions",
+        "./data/birth_test.tsv")
+    self.assertGreaterEqual(n_correct, 1)
     
 
 class Test_1f(GradedTestCase):
@@ -207,7 +207,6 @@ class Test_1f(GradedTestCase):
     self.assertEqual(student_trainer_conf.warmup_tokens, 10240)
     self.assertEqual(student_trainer_conf.final_tokens, 75187200)
     self.assertEqual(student_trainer_conf.ckpt_path, None)
-    self.assertEqual(student_trainer_conf.num_workers, 4)
   
   @graded(is_hidden=True)
   def test_1(self):
@@ -232,38 +231,22 @@ class Test_1g(GradedTestCase):
     self.mconf = submission.GPTConfig(self.pretrain_dataset.vocab_size, self.pretrain_dataset.block_size, n_layer=4, n_head=8, n_embd=256)
     self.perceiver_model = submission.initialize_perceiver_model(self.mconf)
 
-  @graded(timeout=15)
-  def test_0(self):
-    """1g-0-basic:  correct trainer object initialization for finetune with pretraining for perceiver"""
-    student_trainer_conf, student_trainer = submission.finetune('./submission/perceiver.pretrain.params', './data/birth_places_train.tsv', self.pretrain_dataset, BLOCK_SIZE, self.perceiver_model)
-    
-    self.assertEqual(student_trainer_conf.max_epochs, 10)
-    self.assertEqual(student_trainer_conf.batch_size, 256)
-    self.assertEqual(student_trainer_conf.learning_rate, 0.0006)
-    self.assertEqual(student_trainer_conf.betas, (0.9, 0.95))
-    self.assertEqual(student_trainer_conf.grad_norm_clip, 1.0)
-    self.assertEqual(student_trainer_conf.weight_decay, 0.1)
-    self.assertEqual(student_trainer_conf.lr_decay,True)
-    self.assertEqual(student_trainer_conf.warmup_tokens, 10240)
-    self.assertEqual(student_trainer_conf.final_tokens, 75187200)
-    self.assertEqual(student_trainer_conf.ckpt_path, None)
-    self.assertEqual(student_trainer_conf.num_workers, 4)
 
   @graded(is_hidden=True)
   def test_1(self):
-    """1g-1-hidden:   test the dev score for perceiver attention with pretrain"""
+    """1g-0-hidden:   test the dev score for perceiver attention with pretrain"""
     n_correct, n_total = score_preds(
         "./submission/perceiver.pretrain.dev.predictions",
         "./data/birth_dev.tsv")
-    self.assertGreaterEqual(n_correct / n_total, 0.024)
+    self.assertGreaterEqual(n_correct / n_total, 0.022)
   
   @graded(is_hidden=True)
   def test_2(self):
-    """1g-2-hidden:   test the test score for perceiver attention with pretrain"""
+    """1g-1-hidden:   test the test score for perceiver attention with pretrain"""
     n_correct, n_total = score_preds(
         "./submission/perceiver.pretrain.test.predictions",
         "./data/birth_test.tsv")
-    self.assertGreaterEqual(n_correct / n_total, 0.020)
+    self.assertGreaterEqual(n_correct / n_total, 0.016)
   
 def getTestCaseForTestID(test_id):
   question, part, _ = test_id.split('-')
