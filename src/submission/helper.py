@@ -1,4 +1,5 @@
 from .model import GPT
+from .model import CausalSelfAttention
 from .dataset import NameDataset
 from .trainer import Trainer, TrainerConfig
 
@@ -12,6 +13,7 @@ def initialize_vanilla_model(mconf):
     ### [part c]: Make some model here
 
     ### START CODE HERE
+    attention_model=GPT(mconf)
     ### END CODE HERE
     return attention_model
 
@@ -60,6 +62,27 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
     trainer_obj = None #Trainer object (see trainer.py for more details)
     tconf = None #TrainerConfig object (see trainer.py for more details)
     ### START CODE HERE
+    max_epochs=75
+    batch_size=256
+    learning_rate=finetune_lr
+    lr_decay=True
+    warmup_tokens=512*20
+    final_tokens=200*len(pretrain_dataset)*block_size
+    num_workers=0
+    if reading_params_path:
+        model=torch.load(reading_params_path, map_location=torch.device('cpu'))
+        max_epochs=10
+        batch_size=256
+        learning_rate=finetune_lr
+        lr_decay=True
+        warmup_tokens=512*20
+        final_tokens=200*len(pretrain_dataset)*block_size
+        num_workers=0
+
+    tconf = TrainerConfig(max_epochs=max_epochs, batch_size=batch_size, learning_rate=learning_rate,
+                      lr_decay=lr_decay, warmup_tokens=warmup_tokens, final_tokens=final_tokens,
+                      num_workers=num_workers) #TrainerConfig object (see trainer.py for more details)
+    trainer_obj = Trainer(model, pretrain_dataset, None, tconf) #Trainer object (see trainer.py for more details)
     ### END CODE HERE
     return tconf, trainer_obj
 
@@ -96,5 +119,6 @@ def train(model, writing_params_path, trainer_obj):
     ### Note: trainer_obj is of type Trainer (see trainer.py for more details)
 
     ### START CODE HERE
+    trainer_obj.train()
     ### END CODE HERE
     return

@@ -2,6 +2,7 @@ import random
 import torch
 from torch.utils.data import Dataset
 import argparse
+import numpy as np
 
 """
 The input-output pairs (x, y) of the NameDataset are of the following form:
@@ -176,6 +177,25 @@ class CharCorruptionDataset(Dataset):
         ### [part e]: see spec above
 
         ### START CODE HERE
+        entry_document=self.data[idx]
+        random_truncation=random.randint(4,self.max_context_size)
+        truncated_document=entry_document[:random_truncation]
+        masked_content_random_len=int(np.random.normal((random_truncation/4),0.1))
+        prefix_random_len=int((random_truncation-masked_content_random_len)*(3/8))
+        prefix=truncated_document[:prefix_random_len]
+        masked_content=truncated_document[prefix_random_len:(masked_content_random_len+prefix_random_len)]
+        suffix=truncated_document[(prefix_random_len+masked_content_random_len):]
+        masked_string=''.join([prefix,self.MASK_CHAR,suffix,self.MASK_CHAR,masked_content,self.MASK_CHAR])
+        pads_number=(self.block_size - len(masked_string))
+        masked_string=''.join([masked_string,(self.PAD_CHAR*pads_number)])
+        dix = [self.stoi[s] for s in masked_string]
+        input=masked_string[:-1]
+        output=masked_string[1:]
+        dix_input = [self.stoi[s] for s in input]
+        dix_output = [self.stoi[s] for s in output]
+        x = torch.tensor(dix_input, dtype=torch.long)
+        y = torch.tensor(dix_output, dtype=torch.long)
+        return x, y
         ### END CODE HERE
 
         raise NotImplementedError
@@ -189,9 +209,11 @@ if __name__ == '__main__':
     argp.add_argument('dataset_type', help="Type of dataset to sample from."
             "Options: namedata, charcorruption.",
             choices=["namedata", "charcorruption"])
-    args = argp.parse_args()
+    dataset_type='charcorruption'
+    #args = argp.parse_args()
 
-    if args.dataset_type == 'namedata':
+    ##if args.dataset_type == 'namedata':
+    if dataset_type  == 'namedata':
         # Even if it hasn't been implemented, we use it to define the vocab
         corruption_dataset = CharCorruptionDataset(open('./../data/wiki.txt', encoding='utf-8').read(), 128) 
         # Make the name dataset
@@ -202,8 +224,9 @@ if __name__ == '__main__':
             print('x:', ''.join([name_dataset.itos[int(c)] for c in x]))
             print('y:', ''.join([name_dataset.itos[int(c)] for c in y]))
         pass
-    elif args.dataset_type == 'charcorruption':
-        corruption_dataset = CharCorruptionDataset(open('./../data/wiki.txt', encoding='utf-8').read(), 128) 
+    #elif args.dataset_type == 'charcorruption':
+    elif dataset_type  == 'charcorruption':
+        corruption_dataset = CharCorruptionDataset(open('/Users/victorvenegas/courses/XCS224N-A5/src/data/wiki.txt', encoding='utf-8').read(), 128) 
         for _, example in zip(range(4), corruption_dataset):
             x, y = example
             print('x:', ''.join([corruption_dataset.itos[int(c)] for c in x]))
