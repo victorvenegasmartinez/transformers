@@ -82,7 +82,8 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
     tconf = TrainerConfig(max_epochs=max_epochs, batch_size=batch_size, learning_rate=learning_rate,
                       lr_decay=lr_decay, warmup_tokens=warmup_tokens, final_tokens=final_tokens,
                       num_workers=num_workers) #TrainerConfig object (see trainer.py for more details)
-    trainer_obj = Trainer(model, pretrain_dataset, None, tconf) #Trainer object (see trainer.py for more details)
+    name_dataset = NameDataset(open(finetune_corpus_path, encoding='utf-8').read(), pretrain_dataset)
+    trainer_obj = Trainer(model, name_dataset, None, tconf) #Trainer object (see trainer.py for more details)
     ### END CODE HERE
     return tconf, trainer_obj
 
