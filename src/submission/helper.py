@@ -71,7 +71,8 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
     num_workers=0
     if reading_params_path:
         if torch.cuda.is_available(): 
-            device = torch.cuda.current_device()
+            #device = torch.cuda.current_device()
+            device=torch.device('cuda')
         elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
             device = torch.device("mps")
         else:
