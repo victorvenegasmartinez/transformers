@@ -70,14 +70,7 @@ def finetune(reading_params_path, finetune_corpus_path, pretrain_dataset, block_
     final_tokens=200*len(pretrain_dataset)*block_size
     num_workers=0
     if reading_params_path:
-        if torch.cuda.is_available(): 
-            #device = torch.cuda.current_device()
-            device=torch.device('cuda')
-        elif torch.backends.mps.is_available() and torch.backends.mps.is_built():
-            device = torch.device("mps")
-        else:
-            device=torch.device('cpu')
-        model=torch.load(reading_params_path, map_location=device)
+        model.load_state_dict(torch.load(reading_params_path, map_location=torch.device('cpu')))
         max_epochs=10
         batch_size=256
         learning_rate=finetune_lr
