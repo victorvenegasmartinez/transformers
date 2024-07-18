@@ -39,8 +39,8 @@ elif [ "$1" = "vanilla_eval_test_with_pretrain" ]; then
 		echo "'./submission/vanilla.finetune.params' does not exist. Please run './run.sh vanilla_finetune_with_pretrain' on the VM to create this file."
 	fi
 elif [ "$1" = "perceiver_pretrain" ]; then
-	echo "Starting Perceiver Pretrain: ~ 2 Hours"
-	python run.py $ARG_COMPILE $ARG_BACKEND --function=pretrain --variant=perceiver --pretrain_corpus_path=./data/wiki.txt --writing_params_path=./submission/perceiver.pretrain.params	
+	echo "Starting Perceiver Pretrain ccf: ~ 2 Hours"
+	python run.py $ARG_COMPILE $ARG_BACKEND --function=pretrain --variant=perceiver --pretrain_corpus_path=./data/ccf.txt --writing_params_path=./submission/perceiver.pretrain.params	
 elif [ "$1" = "perceiver_finetune_with_pretrain" ]; then
 	if [ -f ./submission/perceiver.pretrain.params ]; then
 		python run.py $ARG_COMPILE $ARG_BACKEND --function=finetune --variant=perceiver --pretrain_corpus_path=./data/wiki.txt --reading_params_path=./submission/perceiver.pretrain.params --writing_params_path=./submission/perceiver.finetune.params --finetune_corpus_path=./data/birth_places_train.tsv

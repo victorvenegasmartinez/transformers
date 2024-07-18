@@ -226,7 +226,7 @@ if __name__ == '__main__':
         pass
     #elif args.dataset_type == 'charcorruption':
     elif dataset_type  == 'charcorruption':
-        corruption_dataset = CharCorruptionDataset(open('/Users/victorvenegas/courses/XCS224N-A5/src/data/wiki.txt', encoding='utf-8').read(), 128) 
+        corruption_dataset = CharCorruptionDataset(open('/Users/victorvenegas/courses/XCS224N-A5/src/data/ccf.txt', encoding='utf-8').read(), 128) 
         for _, example in zip(range(4), corruption_dataset):
             x, y = example
             print('x:', ''.join([corruption_dataset.itos[int(c)] for c in x]))
